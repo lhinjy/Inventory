@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import SearchBar from "./components/SearchBar";
 import ItemsDisplay from "./components/ItemsDisplay";
@@ -39,23 +39,27 @@ function App() {
     setFilters(searchParams);
   };
 
-  const deleteItem = (item) => {
-    const items = data["items"];
-    const requestOptions = {
-      method: "DELETE",
-    };
-    fetch(`http://localhost:9000/items/${item.id}`, requestOptions).then(
-      (response) => {
-        if (response.ok) {
-          // Update current state
-          const idx = items.indexOf(item);
-          // Splice to data and delete
-          items.splice(idx, 1);
-          setData({ items });
+  const deleteItem = useCallback(
+    (item) => {
+      const items = data["items"];
+      const requestOptions = {
+        method: "DELETE",
+      };
+
+      fetch(`http://localhost:9000/items/${item.id}`, requestOptions).then(
+        (response) => {
+          if (response.ok) {
+            // Update current state
+            const idx = items.indexOf(item);
+            // Splice to data and delete
+            items.splice(idx, 1);
+            setData({ items });
+          }
         }
-      }
-    );
-  };
+      );
+    },
+    [data]
+  );
 
   const addItemToData = (item) => {
     const requestOptions = {
